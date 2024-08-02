@@ -1,0 +1,8 @@
+.vs
+bin
+lib
+pkg
+*.exe
+*.dll
+output/*
+vendor/*

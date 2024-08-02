@@ -1,0 +1,3 @@
+1. 파일 작성
+2. c++ 코드 라이브러리로 컴파일 : g++ -shared -o hello.dll hello.cpp
+3. 

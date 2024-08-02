@@ -1,0 +1,10 @@
+make build
+linux: ./math_server 
+windows: math_server.exe -port:8080(기본)
+
+아니면 도커 컨테이너)
+make docker-build
+docker run -p 9090:9090 math_server:latest -port 9090
+
+API: 
+curl -G --data-urlencode "expression= ( 2 + 2 ) * -10" localhost:8080

@@ -1,0 +1,13 @@
+go build -buildmode=c-shared -o libgo.dll
+ㄴ main.c가 main.go에서 참조할 .h 및 .dll파일을 만듬
+gcc -shared -o libc.dll main.c libgo.dll  
+ㄴ main.go의 메인함수가 main.c에서 참조할 dll파일을 만듬
+go run main.go 아니면 go build .
+ㄴ #cgo LDFLAGS:-L. -llibc, extern int add(int a, int b); 로 연동 및 외부 변수로 만들고 있음 
+
+cf) 리눅스에서는 .so가 동적 라이브러리 파일임
+build -buildmode=c-shared -o libgo.so
+gcc -shared -o libc.so main.c libgo.so
+go run main.go
+
+핵심: cgo는 각 c, go언어가 필요로 하는 변수, 함수 등을 라이브러리로 만들어서 연동시켜서 컴파일러로 빌드 해야함

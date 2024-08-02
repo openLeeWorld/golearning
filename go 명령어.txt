@@ -1,0 +1,105 @@
+기본명령어)
+
+go run <파일>: Go 프로그램 임시파일로 컴파일 하고 실행
+go build <파일>: 패키지와 의존성 모듈로 컴파일
+go build -o <실행파일이름> <소스파일>
+go clean : 오브젝트 파일 제거
+go install golang.org/x/tools/gopls@latest: go 패키지 설치 in local 
+go list <파일>: 패키지 목록 조회
+go mod init <파일 or 폴더명>: 모듈 생성(go.mod)
+go mod tidy: 사용되지 않는 버전을 제거
+go mod vendor: 모듈의 의존성 복사 (vendors 디렉토리에)
+go fmt <파일>: go format 맞춤 
+golint <파일>: go 린팅
+go vet <파일>: go tool vet 실행
+go version : go 버전
+go get -u <모듈이름> : 모듈 최신버전으로 업데이트
+go list -m -versions <모듈이름> : 모듈 리스트 중 가능한 버전 나열
+go test <테스트 파일>: *_test.go파일들을 테스트 코드로 인식하고 일괄적으로 테스트 실행
+go test -v -cover -coverprofile=c.out : code coverage 확인 및 c.out에 기록
+go test -bench=. : 모든 벤치마크 파일 전부 벤치마크
+go tool cover -html=c.out : 웹으로 커버리지 확인
+go build -race / go test -race : 고루틴 race 컨디션 확인 (set CGO_ENABLED=1 or export CGO_ENABLED=1) 단, 10배 이상 느리게 실행 
+
+./... : <파일>대신 현재 디렉토리 아래의 전부 확인 (없으면 루트 디렉토리부터 함)
+-v: verbose
+
+go 소스코드 점검)
+
+golangci-lint(통합)
+shadow.exe(섀도우된 변수: 외부 변수를 내부 블록에서 가리는 것) 점검)
+gopls: go language server
+(language server protocol: auto complete, hover, go to definition, find all references 등과 같은 소스 편집 기능 제공 서버)
+ex) go, java, ts, emacs, vim. vscode 등에 적용되는 자동 기능
+
+그 외 goimports, staticcheck 등 패키지로 다운 가능
+
+
+환경변수: 
+GOPATH, 시스템 환경변수 path에 자동으로 Go 설치파일 bin 폴더 해놓음(go.exe)
+
+cgo 환경변수: (mingw64는 윈도우 gcc, 리눅스는 gcc 라이브러리 경로 따로 설정)
+CGO_ENABLED=1
+CGO_CFLAGS = -IC:\mingw64\include
+CGO_LDFLGS = -LC:\mingw64\lib
+
+프로젝트 패키지 실행파일: 
+%HOMEPROFILE%/go/bin
+
+프로젝트 폴더 구조:
+bin, lib, pkg, src, test 등
+
+환경설정: 
+vscode go 확장, go playground, jetbrains goland(유료)
+
+go package 저장소에 공유만 하면 패키지를 바로 다운 가능 
+
+-------------------------------------------------------------------------------
+go 프로젝트 및 모듈, 패키지 생성
+go mod init project -> go mod tidy(프로젝트 의존성 다운, go sum 파일 생성)
+패키지명은 영어 소문자만 가능!!!
+외부로 export할 상수, 변수, 함수 등은 첫문자가 영어 대문자고, 소문자나 특수문자로 된 건 내부용!!
+
+project/
+|-- main.go
+|-- config/ (패키지명과 폴더 이름 동일, 파일명은 달라도 됨)
+    |-- config.go
+|-- models/
+    |-- user.go
+    |-- product.go
+|-- utils/
+    |-- stringutils.go
+    |-- mathutils.go
+
+main.go)
+
+package main
+
+import (
+    "fmt"
+    "project/config"
+    "project/models"
+    "project/utils"
+)
+
+func main() {
+    config.LoadConfig()
+    user := models.User{Name: "John"}
+    fmt.Println(user)
+    fmt.Println(utils.Add(2, 3))
+}
+----------------------------------------------------------------------------------
+중요) 모든 패키지의 파일에서 외부로 노출할 함수나 변수는 대문자로 시작하고 위에 주석을 달며
+내부적으로만 쓰일 함수나 변수난 소문자나 특수문자로 이루어져도 괜찮다.
+
+// +build integration : 빌드 태그 (다른 플랫폼에서 컴파일 될 수 있는 다른 코드를 허용, 그룹으로 테스트 나눔(지원되는 자원이 가용할 때만 수행))
+
+go test -short: 오래 걸리는 테스트를 건너뜀
+if testing.Short() {
+    t.Skip("skipping test in short mode")
+}
+
+cgo: go에서 c코드나 라이브러리 호출, 상호성을 위한 도구 (gcc나 cygwin 필요)
+gcc -shared -o mylib.dll mylib.c (리눅스는 .so, macos는 .dylib)로 동적 라이브러리를 생성해서 (c++은 g++)
+#cgo LDFLAGS:-L. -lmylib 로 c 컴파일러 링커 설정에 추가해줌(환경변수로 적용 아닐 시) 참고로 -lm은 수학 라이브러리 연동
+
